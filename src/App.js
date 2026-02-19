@@ -1,11 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
-  const [transactions, setTransactions] = useState([]);
+  // Load transactions from localStorage initially
+  const [transactions, setTransactions] = useState(() => {
+    const saved = localStorage.getItem("transactions");
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("Income");
+
+  // Save transactions to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+  }, [transactions]);
 
   const addTransaction = () => {
     if (!description || !amount || amount <= 0) {
@@ -44,17 +54,11 @@ function App() {
     <div className="container">
       <h1>Expense Tracker</h1>
 
-      <div className="balance">
-        Balance: ₹ {balance}
-      </div>
+      <div className="balance">Balance: ₹ {balance}</div>
 
       <div className="summary">
-        <div className="income">
-          Income: ₹ {totalIncome}
-        </div>
-        <div className="expense">
-          Expense: ₹ {totalExpense}
-        </div>
+        <div className="income">Income: ₹ {totalIncome}</div>
+        <div className="expense">Expense: ₹ {totalExpense}</div>
       </div>
 
       {/* Form */}
@@ -85,15 +89,12 @@ function App() {
       <div className="transaction-list">
         {transactions.map((t) => (
           <div
-  key={t.id}
-  className="transaction-item"
-  style={{
-    borderLeft: t.type === "Income"
-      ? "5px solid green"
-      : "5px solid red"
-  }}
->
-
+            key={t.id}
+            className="transaction-item"
+            style={{
+              borderLeft: t.type === "Income" ? "5px solid green" : "5px solid red",
+            }}
+          >
             <span>
               {t.description} - ₹ {t.amount} ({t.type})
             </span>
